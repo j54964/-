@@ -76,10 +76,15 @@
             else if (unit === 'half') grams = weight * 300;
             
             // 計算各單位價格
-            let perKg = (price / grams * 1000).toFixed(2);
-            let per100g = (price / grams * 100).toFixed(2);
-            let perCatty = (price / grams * 600).toFixed(2);
-            let perHalf = (price / grams * 300).toFixed(2);
+            function formatPrice(value) {
+                let num = parseFloat(value.toFixed(2));
+                return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+            }
+            
+            let perKg = formatPrice(price / grams * 1000);
+            let per100g = formatPrice(price / grams * 100);
+            let perCatty = formatPrice(price / grams * 600);
+            let perHalf = formatPrice(price / grams * 300);
             
             let result = '每公斤 ' + perKg + ' 元<br>' +
                 '每100克 ' + per100g + ' 元<br>' +
