@@ -8,20 +8,24 @@
         body { margin: 10px; font-size: 16px; }
         table { width: 100%; border-collapse: collapse; }
         td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
-        input { width: 90%; font-size: 16px; padding: 5px; }
-        select { width: 95%; font-size: 16px; padding: 5px; }
-        button { width: 100%; font-size: 16px; padding: 10px; margin-top: 10px; }
-        .result { margin-top: 10px; font-size: 14px; line-height: 1.8; }
+        input { width: 48%; font-size: 16px; padding: 5px; }
+        select { width: 48%; font-size: 16px; padding: 5px; }
+        button { width: 100%; font-size: 16px; padding: 10px; margin-top: 5px; }
+        .result { margin-top: 10px; font-size: 14px; line-height: 1.6; }
+        hr { margin: 8px 0; border: 0; border-top: 1px solid #ddd; }
+        .cheaper { background-color: #d4edda; }
+        .tip { font-weight: bold; color: green; margin-bottom: 5px; }
     </style>
 </head>
 <body>
-    <h3>重量價格比較</h3>
+    <h3>重量價格比較	by Jqq</h3>
     
     <table>
         <tr>
-            <td>
-                <input type="number" id="priceA" oninput="calc('A')" placeholder="總價"><br>
-                <input type="number" id="weightA" oninput="calc('A')" placeholder="重量"><br>
+            <td id="cellA">
+                <div id="tipA"></div>
+                <input type="number" id="priceA" oninput="calc('A')" placeholder="總價"><br><br>
+                <input type="number" id="weightA" oninput="calc('A')" placeholder="重量">
                 <select id="unitA" onchange="calc('A')">
                     <option value="g">克</option>
                     <option value="kg">公斤</option>
@@ -29,10 +33,12 @@
                     <option value="half">半斤</option>
                 </select>
                 <div class="result" id="resultA"></div>
+                <button onclick="clearLeft()">清除左邊</button>
             </td>
-            <td>
-                <input type="number" id="priceB" oninput="calc('B')" placeholder="總價"><br>
-                <input type="number" id="weightB" oninput="calc('B')" placeholder="重量"><br>
+            <td id="cellB">
+                <div id="tipB"></div>
+                <input type="number" id="priceB" oninput="calc('B')" placeholder="總價"><br><br>
+                <input type="number" id="weightB" oninput="calc('B')" placeholder="重量">
                 <select id="unitB" onchange="calc('B')">
                     <option value="g">克</option>
                     <option value="kg">公斤</option>
@@ -40,17 +46,7 @@
                     <option value="half">半斤</option>
                 </select>
                 <div class="result" id="resultB"></div>
-            </td>
-            <td>
-                <input type="number" id="priceC" oninput="calc('C')" placeholder="總價"><br>
-                <input type="number" id="weightC" oninput="calc('C')" placeholder="重量"><br>
-                <select id="unitC" onchange="calc('C')">
-                    <option value="g">克</option>
-                    <option value="kg">公斤</option>
-                    <option value="catty">台斤</option>
-                    <option value="half">半斤</option>
-                </select>
-                <div class="result" id="resultC"></div>
+                <button onclick="clearRight()">清除右邊</button>
             </td>
         </tr>
     </table>
@@ -81,26 +77,70 @@
                 return num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
             }
             
-            let perKg = formatPrice(price / grams * 1000);
             let per100g = formatPrice(price / grams * 100);
+            let perKg = formatPrice(price / grams * 1000);
             let perCatty = formatPrice(price / grams * 600);
             let perHalf = formatPrice(price / grams * 300);
             
-            let result = '每公斤 ' + perKg + ' 元<br>' +
-                '每100克 ' + per100g + ' 元<br>' +
-                '每台斤 ' + perCatty + ' 元<br>' +
-                '每半斤 ' + perHalf + ' 元';
+            let result = '每100克<br>' + per100g + ' 元<hr>' +
+                '每公斤<br>' + perKg + ' 元<hr>' +
+                '每台斤<br>' + perCatty + ' 元<hr>' +
+                '每半斤<br>' + perHalf + ' 元';
             
             document.getElementById('result' + col).innerHTML = result;
+            compare();
+        }
+        
+        function compare() {
+            let priceA = parseFloat(document.getElementById('priceA').value);
+            let weightA = parseFloat(document.getElementById('weightA').value);
+            let unitA = document.getElementById('unitA').value;
+            let priceB = parseFloat(document.getElementById('priceB').value);
+            let weightB = parseFloat(document.getElementById('weightB').value);
+            let unitB = document.getElementById('unitB').value;
+            
+            document.getElementById('cellA').className = '';
+            document.getElementById('cellB').className = '';
+            document.getElementById('tipA').innerHTML = '';
+            document.getElementById('tipB').innerHTML = '';
+            
+            if (!priceA || !weightA || !priceB || !weightB) return;
+            
+            let gramsA = unitA === 'g' ? weightA : unitA === 'kg' ? weightA * 1000 : unitA === 'catty' ? weightA * 600 : weightA * 300;
+            let gramsB = unitB === 'g' ? weightB : unitB === 'kg' ? weightB * 1000 : unitB === 'catty' ? weightB * 600 : weightB * 300;
+            let perKgA = priceA / gramsA * 1000;
+            let perKgB = priceB / gramsB * 1000;
+            
+            if (perKgA < perKgB) {
+                document.getElementById('cellA').className = 'cheaper';
+                document.getElementById('tipA').innerHTML = '<div class="tip">✓ 較便宜</div>';
+            } else if (perKgB < perKgA) {
+                document.getElementById('cellB').className = 'cheaper';
+                document.getElementById('tipB').innerHTML = '<div class="tip">✓ 較便宜</div>';
+            }
+        }
+        
+        function clearLeft() {
+            document.getElementById('priceA').value = '';
+            document.getElementById('weightA').value = '';
+            document.getElementById('unitA').selectedIndex = 0;
+            document.getElementById('resultA').innerHTML = '';
+            document.getElementById('cellA').className = '';
+            document.getElementById('tipA').innerHTML = '';
+        }
+        
+        function clearRight() {
+            document.getElementById('priceB').value = '';
+            document.getElementById('weightB').value = '';
+            document.getElementById('unitB').selectedIndex = 0;
+            document.getElementById('resultB').innerHTML = '';
+            document.getElementById('cellB').className = '';
+            document.getElementById('tipB').innerHTML = '';
         }
         
         function clearAll() {
-            ['A', 'B', 'C'].forEach(col => {
-                document.getElementById('price' + col).value = '';
-                document.getElementById('weight' + col).value = '';
-                document.getElementById('unit' + col).selectedIndex = 0;
-                document.getElementById('result' + col).innerHTML = '';
-            });
+            clearLeft();
+            clearRight();
         }
     </script>
 </body>
