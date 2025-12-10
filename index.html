@@ -14,11 +14,11 @@
         .result { margin-top: 10px; font-size: 14px; line-height: 1.6; }
         hr { margin: 8px 0; border: 0; border-top: 1px solid #ddd; }
         .cheaper { background-color: #d4edda; }
-        .tip { font-weight: bold; color: green; margin-bottom: 5px; }
+        .tip { font-weight: bold; color: green; margin-bottom: 5px; height: 20px; }
     </style>
 </head>
 <body>
-    <h3>重量價格比較	by Jqq</h3>
+    <h3>重量價格比較	by jqq</h3>
     
     <table>
         <tr>
@@ -33,7 +33,7 @@
                     <option value="half">半斤</option>
                 </select>
                 <div class="result" id="resultA"></div>
-                <button onclick="clearLeft()">清除左邊</button>
+                <button onclick="clearLeft()">清除</button>
             </td>
             <td id="cellB">
                 <div id="tipB"></div>
@@ -46,7 +46,7 @@
                     <option value="half">半斤</option>
                 </select>
                 <div class="result" id="resultB"></div>
-                <button onclick="clearRight()">清除右邊</button>
+                <button onclick="clearRight()">清除</button>
             </td>
         </tr>
     </table>
@@ -114,9 +114,11 @@
             if (perKgA < perKgB) {
                 document.getElementById('cellA').className = 'cheaper';
                 document.getElementById('tipA').innerHTML = '<div class="tip">✓ 較便宜</div>';
+                document.getElementById('tipB').innerHTML = '<div class="tip"></div>';
             } else if (perKgB < perKgA) {
                 document.getElementById('cellB').className = 'cheaper';
                 document.getElementById('tipB').innerHTML = '<div class="tip">✓ 較便宜</div>';
+                document.getElementById('tipA').innerHTML = '<div class="tip"></div>';
             }
         }
         
